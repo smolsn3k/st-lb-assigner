@@ -42,6 +42,7 @@ function settings() {
     s.charSort ??= 'newest';
     s.bookSort ??= 'az';
     s.bgOpacity ??= 90;
+    s.showAvatars ??= true;
     s.firstSeen ??= {};
     return s;
 }
@@ -186,7 +187,12 @@ async function applyPrimary(name) {
 
 /* ---------- rendering ---------- */
 
-function makeRow(checked, label, subs, onToggle) {
+function avatarUrl(file) {
+    if (typeof ST.getThumbnailUrl === 'function') return ST.getThumbnailUrl('avatar', file);
+    return `/thumbnail?type=avatar&file=${encodeURIComponent(file)}`;
+}
+
+function makeRow(checked, label, subs, onToggle, avatarFile = null) {
     const row = $('<label class="mla-row"></label>');
     const cb = $('<input type="checkbox">').prop('checked', checked).on('change', function () {
         onToggle(this.checked);
@@ -194,7 +200,9 @@ function makeRow(checked, label, subs, onToggle) {
     });
     const text = $('<div></div>').append($('<div></div>').text(label));
     subs.filter(Boolean).forEach((t) => text.append($('<div class="mla-sub"></div>').text(t)));
-    return row.append(cb, text);
+    row.append(cb);
+    if (avatarFile) row.append($('<img class="mla-avatar" loading="lazy" alt="">').attr('src', avatarUrl(avatarFile)));
+    return row.append(text);
 }
 
 function renderChars() {
@@ -205,7 +213,7 @@ function renderChars() {
             const extra = findEntry(key)?.extraBooks ?? [];
             const primary = primaryOf(c);
             return {
-                key, label: c.name ?? key, primary, extra,
+                key, label: c.name ?? key, primary, extra, avatar: c.avatar,
                 date: Number(c.date_added) || 0,
                 lastChat: Number(c.date_last_chat) || 0,
                 count: extra.length + (primary ? 1 : 0),
@@ -221,6 +229,7 @@ function renderChars() {
             state.chars.has(c.key), c.label,
             [c.primary ? `Primary: ${c.primary}` : '', c.extra.length ? `Additional: ${c.extra.join(', ')}` : ''],
             (on) => { on ? state.chars.add(c.key) : state.chars.delete(c.key); },
+            s.showAvatars ? c.avatar : null,
         ));
     });
     if (items.length > MAX_SHOWN) box.append(`<div class="mla-note">Showing first ${MAX_SHOWN} of ${items.length}. Use search to narrow.</div>`);
@@ -336,6 +345,7 @@ function buildUI() {
             <div class="mla-tools">
               <div id="mla_char_all" class="menu_button">Select shown</div>
               <div id="mla_char_none" class="menu_button">Clear</div>
+              <label class="checkbox_label"><input id="mla_show_avatars" type="checkbox" ${s.showAvatars ? 'checked' : ''}><span>Show avatars</span></label>
             </div>
             <div id="mla_char_list" class="mla-list"></div>
           </div>
@@ -390,6 +400,11 @@ function buildUI() {
     $('#mla_char_sort').on('change', function () { settings().charSort = this.value; ST.saveSettingsDebounced(); renderChars(); });
     $('#mla_book_sort').on('change', function () { settings().bookSort = this.value; ST.saveSettingsDebounced(); renderBooks(); });
 
+    $('#mla_show_avatars').on('change', function () {
+        settings().showAvatars = this.checked;
+        ST.saveSettingsDebounced();
+        renderChars();
+    });
     $('#mla_char_all').on('click', () => { shown.chars.forEach((c) => state.chars.add(c.key)); renderChars(); updateCounts(); });
     $('#mla_char_none').on('click', () => { state.chars.clear(); renderChars(); updateCounts(); });
     $('#mla_book_all').on('click', () => { shown.books.forEach((b) => state.books.add(b.key)); renderBooks(); updateCounts(); });

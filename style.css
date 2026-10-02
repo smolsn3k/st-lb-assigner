@@ -27,6 +27,8 @@
 .mla-row { display: flex; align-items: flex-start; gap: 8px; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
 .mla-row:hover { background: var(--white30a, rgba(255, 255, 255, 0.12)); }
 .mla-row input { margin-top: 3px; }
+.mla-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex: none; background: var(--white30a, rgba(255,255,255,0.12)); }
+.mla-row { align-items: center; }
 .mla-sub { font-size: 0.8em; opacity: 0.65; word-break: break-word; }
 .mla-footer { display: flex; gap: 14px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--SmartThemeBorderColor, #555); flex-wrap: wrap; }
 .mla-group { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
