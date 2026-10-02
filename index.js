@@ -1,6 +1,7 @@
 import * as ST from '../../../../script.js';
 import * as WI from '../../../world-info.js';
-import { extension_settings } from '../../../extensions.js';
+import * as EXT from '../../../extensions.js';
+const { extension_settings } = EXT;
 
 const MODULE = 'multi_lorebook_assigner';
 const MAX_SHOWN = 500;
@@ -132,13 +133,28 @@ function applyAdditional(mode) {
 
 /* ---------- Primary lorebook ---------- */
 
+// writeExtensionField lives in different modules depending on the SillyTavern version,
+// so look for it in several places and fall back to calling the API directly.
+async function writePrimary(idx, name) {
+    const ctx = globalThis.SillyTavern?.getContext?.() ?? {};
+    const fn = EXT.writeExtensionField ?? ST.writeExtensionField ?? ctx.writeExtensionField;
+    if (typeof fn === 'function') {
+        await fn(idx, 'world', name);
+        return;
+    }
+    const getHeaders = ST.getRequestHeaders ?? ctx.getRequestHeaders;
+    if (typeof getHeaders !== 'function') throw new Error('No way to build request headers');
+    const res = await fetch('/api/characters/merge-attributes', {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ avatar: ST.characters[idx].avatar, data: { extensions: { world: name } } }),
+    });
+    if (!res.ok) throw new Error(`merge-attributes failed: ${res.status}`);
+}
+
 async function applyPrimary(name) {
     if (state.busy) return;
     if (!state.chars.size) { toastr.warning('Select at least one bot.'); return; }
-    if (typeof ST.writeExtensionField !== 'function') {
-        toastr.error('This SillyTavern version has no writeExtensionField; cannot set primary lorebooks.');
-        return;
-    }
     state.busy = true;
     let ok = 0, fail = 0;
     try {
@@ -146,7 +162,7 @@ async function applyPrimary(name) {
             const idx = ST.characters.findIndex((c) => charKey(c) === key);
             if (idx < 0) { fail++; continue; }
             try {
-                await ST.writeExtensionField(idx, 'world', name);
+                await writePrimary(idx, name);
                 const c = ST.characters[idx];
                 c.data ??= {};
                 c.data.extensions ??= {};
