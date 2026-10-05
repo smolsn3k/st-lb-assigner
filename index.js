@@ -274,6 +274,8 @@ function renderPrimarySelect() {
 function updateCounts() {
     $('#mla_char_count').text(`${state.chars.size} selected`);
     $('#mla_book_count').text(`${state.books.size} selected`);
+    $('#mla_tab_chars').text(`Bots (${state.chars.size})`);
+    $('#mla_tab_books').text(`Lorebooks (${state.books.size})`);
 }
 
 function render() {
@@ -291,6 +293,12 @@ const optionsHtml = (list, current) =>
 function applyOpacity(v) {
     $('.mla-window')[0]?.style.setProperty('--mla-bg', `${v}%`);
     $('#mla_opacity_val').text(`${v}%`);
+}
+
+function setTab(name) {
+    $('.mla-window').toggleClass('show-books', name === 'books');
+    $('#mla_tab_chars').toggleClass('active', name !== 'books');
+    $('#mla_tab_books').toggleClass('active', name === 'books');
 }
 
 function openWindow() {
@@ -334,6 +342,10 @@ function buildUI() {
             <span id="mla_opacity_val" class="mla-opacity-val"></span>
           </div>
           <div id="mla_close" class="menu_button fa-solid fa-xmark" title="Close"></div>
+        </div>
+        <div class="mla-tabs">
+          <div id="mla_tab_chars" class="menu_button mla-tab active">Bots</div>
+          <div id="mla_tab_books" class="menu_button mla-tab">Lorebooks</div>
         </div>
         <div class="mla-body">
           <div class="mla-col">
@@ -384,6 +396,8 @@ function buildUI() {
 
     // wiring
     $('#mla_open').on('click', openWindow);
+    $('#mla_tab_chars').on('click', () => setTab('chars'));
+    $('#mla_tab_books').on('click', () => setTab('books'));
     $('#mla_close').on('click', closeWindow);
     $('#mla_overlay').on('mousedown', (e) => { if (e.target.id === 'mla_overlay') closeWindow(); });
     $(document).on('keydown', (e) => { if (e.key === 'Escape' && $('#mla_overlay').hasClass('open')) closeWindow(); });
