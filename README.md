@@ -2,15 +2,24 @@
 
 A small SillyTavern extension for assigning lorebooks to many bots at once. It handles both the **primary lorebook** and the **additional lorebooks** of each bot.
 
-Version 1.3.1
+Version 1.3.1 · [GitHub](https://github.com/smolsn3k/st-lb-assigner)
 
 ## Install
 
-1. Copy the `multi-lorebook-assigner` folder into your SillyTavern extensions folder:
-   - Recent versions: `data/<your-user>/extensions/` (usually `data/default-user/extensions/`)
-   - Older versions: `public/scripts/extensions/third-party/`
-2. Restart SillyTavern and hard-refresh the page (Ctrl+F5).
-3. Open the **Extensions** tab (the stacked-blocks icon). You'll find a **Multi Lorebook Assigner** drawer with an **Open Lorebook Assigner** button.
+Install it through SillyTavern's built-in extension installer:
+
+1. Open the **Extensions** tab (the stacked-blocks icon).
+2. Click **Install extension** at the top of the panel.
+3. Paste the repository URL and click **Install**:
+   ```
+   https://github.com/smolsn3k/st-lb-assigner
+   ```
+   If you're asked, choose whether to install it for just you or for all users.
+4. Reload the page if it doesn't appear right away. You'll find a **Multi Lorebook Assigner** drawer in the Extensions tab with an **Open Lorebook Assigner** button.
+
+### Updating
+
+Open **Manage extensions** in the Extensions tab and use the update button next to Multi Lorebook Assigner, then reload the page. You can also uninstall it from there.
 
 ## Usage
 
@@ -63,7 +72,7 @@ Sort choices, the avatar toggle and the opacity level are remembered between ses
 
 ## Troubleshooting
 
-- **Nothing appears in the Extensions tab:** check that the folder sits directly inside the extensions folder (not nested one level deeper) and that `manifest.json` is in it. Then hard-refresh.
+- **Nothing appears in the Extensions tab:** open **Manage extensions** and check that Multi Lorebook Assigner is listed and enabled, then hard-refresh (Ctrl+F5).
 - **An error toast appears or something doesn't work:** open the browser console (F12) and look for lines starting with `[MLA]` or red errors.
 - **Layout looks wrong on a phone:** hard-refresh to clear the cached stylesheet.
 
